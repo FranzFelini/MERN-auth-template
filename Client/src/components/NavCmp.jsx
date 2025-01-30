@@ -33,7 +33,7 @@ function Navbar() {
           {user ? (
             <>
               <Link
-                to="/profile"
+                to="/dashboard"
                 className="hover:text-gray-300 transition duration-300"
               >
                 Profile

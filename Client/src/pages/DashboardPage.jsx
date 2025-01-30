@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { UserContext } from "../../context/userContext";
+import TodoList from "../components/ToDoCmp";
 
 function Dash() {
   const { user } = useContext(UserContext);
@@ -13,6 +14,10 @@ function Dash() {
               Welcome, {user.name}! 👋
             </h1>
             <p className="text-gray-500 mt-2">Glad to see you!</p>
+            <h3 className="text-xl font-thin mt-[0.5em]">
+              This is dashboard page
+            </h3>
+            <TodoList />
           </>
         ) : (
           <p className="text-gray-500 animate-pulse">Loading...</p>

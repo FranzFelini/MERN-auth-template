@@ -1,20 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const { test, registerUser, loginUser, getProfile } =
-  require("../controllers/authController").default;
+const {
+  test,
+  registerUser,
+  loginUser,
+  getProfile,
+  addTodo,
+  getTodos,
+  completeTodo,
+  deleteTodo,
+} = require("../controllers/authController").default;
 
 const router = express.Router();
 
-//middleware for routes
-
+// Middleware for routes
 router.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Frontend URL (update it as per your setup)
   })
 );
 
+// Test route
 router.get("/", test);
+
+// Authentication routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", getProfile);
@@ -25,5 +35,10 @@ router.post("/logout", (req, res) => {
   });
   res.json({ message: "Logged out successfully" });
 });
+
+router.post("/todo", addTodo);
+router.get("/todos", getTodos);
+router.put("/todo/:id", completeTodo);
+router.delete("/todo/:id", deleteTodo);
 
 module.exports = router;

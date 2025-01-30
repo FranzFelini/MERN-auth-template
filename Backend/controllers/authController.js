@@ -1,8 +1,10 @@
 import { compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { hash } from "../helpers/authEncryption.js";
+import TodoModel from "../models/todo.js";
 import UserModel from "../models/user.js";
 
+// Test route
 const test = (req, res) => {
   res.json("test is working");
 };
@@ -10,20 +12,18 @@ const test = (req, res) => {
 // POST req for register endpoint
 const registerUser = async (req, res) => {
   try {
-    //name validation - check if name exists
     const { name, email, password } = req.body;
     if (!name) {
       return res.json({
-        error: "name is reqired",
+        error: "Name is required",
       });
     }
-    //password validation - check if the password exists and if's over 8 chars long
-    if (!password || password < 8) {
+    if (!password || password.length < 8) {
       return res.json({
-        error: "Password must be 8+ charachters long",
+        error: "Password must be 8+ characters long",
       });
     }
-    //email validation - check if the email is taken (if it exists in the DB) // add email validation
+
     const exist = await UserModel.findOne({ email });
     if (exist) {
       return res.json({
@@ -32,21 +32,19 @@ const registerUser = async (req, res) => {
     }
 
     const hashedPass = await hash(password);
-
     const user = await UserModel.create({ name, email, password: hashedPass });
 
     return res.json(user);
   } catch (error) {
-    console.log(error).status(503);
+    console.log(error);
+    res.status(503).json({ error: "Server error" });
   }
 };
 
 // POST req for login endpoint
 const loginUser = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
-
-    // Check if user exists
+    const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {
       return res.json({
@@ -54,7 +52,6 @@ const loginUser = async (req, res) => {
       });
     }
 
-    // Check password match
     const match = await compare(password, user.password);
     if (match) {
       jwt.sign(
@@ -84,6 +81,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get profile route (user info from token)
 const getProfile = (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -96,4 +94,75 @@ const getProfile = (req, res) => {
   }
 };
 
-export default { test, registerUser, loginUser, getProfile };
+// Add a new to-do item for the logged-in user
+const addTodo = async (req, res) => {
+  try {
+    const { task } = req.body;
+    const userId = req.user.id; // Get the logged-in user's ID from the token
+
+    const newTodo = new TodoModel({
+      task,
+      user: userId,
+    });
+
+    await newTodo.save();
+    res.status(201).json(newTodo);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add todo" });
+  }
+};
+
+// Get all to-do items for the logged-in user
+const getTodos = async (req, res) => {
+  try {
+    const userId = req.user.id; // Get the logged-in user's ID from the token
+    const todos = await TodoModel.find({ user: userId });
+    res.json(todos);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch todos" });
+  }
+};
+
+// Mark a to-do item as completed
+const completeTodo = async (req, res) => {
+  try {
+    const todo = await TodoModel.findById(req.params.id);
+    if (!todo) return res.status(404).json({ error: "Todo not found" });
+
+    if (todo.user.toString() !== req.user.id)
+      return res.status(403).json({ error: "Unauthorized" });
+
+    todo.isCompleted = true;
+    await todo.save();
+    res.json(todo);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to mark todo as completed" });
+  }
+};
+
+// Delete a to-do item
+const deleteTodo = async (req, res) => {
+  try {
+    const todo = await TodoModel.findById(req.params.id);
+    if (!todo) return res.status(404).json({ error: "Todo not found" });
+
+    if (todo.user.toString() !== req.user.id)
+      return res.status(403).json({ error: "Unauthorized" });
+
+    await todo.remove();
+    res.json({ message: "Todo deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete todo" });
+  }
+};
+
+export default {
+  test,
+  registerUser,
+  loginUser,
+  getProfile,
+  addTodo,
+  getTodos,
+  completeTodo,
+  deleteTodo,
+};
