@@ -1,0 +1,40 @@
+DO
+## ToDo List for Book Store API (Node.js)
+
+**Phase 1: Data Retrieval and Search (Points: 10)**
+
+* [ ] **Task 1:** Get the book list available in the shop. (2 pts)
+* [ ] **Task 2:** Get books based on ISBN. (2 pts)
+* [ ] **Task 3:** Get all books by Author. (2 pts)
+* [ ] **Task 4:** Get all books based on Title. (2 pts)
+* [ ] **Task 5:** Get book Review. (2 pts)
+
+**Phase 2: User Authentication (Points: 6)**
+
+* [ ] **Task 6:** Register New user. (3 pts)
+* [ ] **Task 7:** Login as a Registered user. (3 pts)
+
+**Phase 3: User Review Management (Points: 4)**
+
+* [ ] **Task 8:** Add/Modify a book review (Registered Users only). (2 pts)
+* [ ] **Task 9:** Delete book review added by that particular user (Registered Users only). (2 pts)
+
+**Phase 4: Asynchronous Operations (Points: 8)**
+
+* [ ] **Task 10:** Get all books – Using async callback function. (2 pts)
+* [ ] **Task 11:** Search by ISBN – Using Promises. (2 pts)
+* [ ] **Task 12:** Search by Author. (2 pts)
+* [ ] **Task 13:** Search by Title. (2 pts)
+
+**Phase 5: Project Submission (Points: 2)**
+
+* [ ] **Task 14:** Submission of Project GitHub Link. (2 pts)
+
+**General Tasks/Reminders:**
+
+* [ ] Use Async/Await or Promises with Axios in Node.js for all data retrieval methods (Tasks 1-5, 10-13).
+* [ ] Ensure proper error handling for all API calls.
+* [ ] Implement data validation where necessary (e.g., user registration, review submission).
+* [ ] Write clear and concise code with comments.
+* [ ] Test all API endpoints thoroughly.
+* [ ] Create a README file with clear instructions on how to run the project.
