@@ -24,26 +24,18 @@ function AuthForm({ type }) {
 
       if (responseData.error) {
         toast.error(responseData.error);
+        return;
+      }
+
+      setData({ name: "", email: "", password: "" }); // Clear form fields
+
+      if (type === "register") {
+        toast.success("Registration successful! Please log in.");
+        navigate("/login"); // Immediately navigate to login after successful registration
       } else {
-        setData({ name: "", email: "", password: "" }); // Clear form fields after successful submission
-
-        if (responseData.user) {
-          setUser(responseData.user); // Set the user in context
-
-          toast.success(
-            type === "register"
-              ? "Registration successful!"
-              : "Logged in successfully!"
-          );
-
-          // After successful registration, redirect to the login page
-          if (type === "register") {
-            toast.success("Registration successful! Please log in.");
-            navigate("/login"); // Navigate to the login page after successful registration
-          } else {
-            navigate("/dashboard"); // Navigate to the dashboard after login
-          }
-        }
+        setUser(responseData.user); // Only set user context for login
+        toast.success("Logged in successfully!");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Error in submission:", error);
@@ -55,6 +47,7 @@ function AuthForm({ type }) {
     }
   };
 
+  // Rest of your component remains the same
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
       <div className="bg-white p-8 rounded-3xl shadow-lg max-w-md w-full space-y-6">

@@ -81,7 +81,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Get profile route (user info from token)
+// req for JWT
 const getProfile = (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -94,7 +94,9 @@ const getProfile = (req, res) => {
   }
 };
 
-// Add a new to-do item for the logged-in user
+/* Test functionalty, figured out that it was useless here so feel free to delete it :D When you do there might be
+some problems with the imports so take care of that before you run anything.
+*/
 const addTodo = async (req, res) => {
   try {
     const { task } = req.body;
@@ -112,7 +114,6 @@ const addTodo = async (req, res) => {
   }
 };
 
-// Get all to-do items for the logged-in user
 const getTodos = async (req, res) => {
   try {
     const userId = req.user.id; // Get the logged-in user's ID from the token
@@ -123,7 +124,6 @@ const getTodos = async (req, res) => {
   }
 };
 
-// Mark a to-do item as completed
 const completeTodo = async (req, res) => {
   try {
     const todo = await TodoModel.findById(req.params.id);
@@ -140,7 +140,6 @@ const completeTodo = async (req, res) => {
   }
 };
 
-// Delete a to-do item
 const deleteTodo = async (req, res) => {
   try {
     const todo = await TodoModel.findById(req.params.id);

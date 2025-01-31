@@ -13,7 +13,7 @@ const {
 
 const router = express.Router();
 
-// Middleware for routes
+// Middleware
 router.use(
   cors({
     credentials: true,
@@ -21,10 +21,10 @@ router.use(
   })
 );
 
-// Test route
+//First test the routes
 router.get("/", test);
 
-// Authentication routes
+//Other routes, since this is a template, in most cases you will change them right away
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", getProfile);
