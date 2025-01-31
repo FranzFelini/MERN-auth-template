@@ -47,9 +47,8 @@ function AuthForm({ type }) {
     }
   };
 
-  // Rest of your component remains the same
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-950 via-blue-950 to-indigo-600 px-4 sm:px-6 lg:px-8">
       <div className="bg-white p-8 rounded-3xl shadow-lg max-w-md w-full space-y-6">
         <h2 className="text-3xl font-extrabold text-center text-gray-800">
           {type === "register" ? "Create an Account" : "Login to Your Account"}

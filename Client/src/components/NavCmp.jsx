@@ -24,8 +24,8 @@ function Navbar() {
     <nav className="bg-black text-white px-6 py-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold tracking-wide">
-          Example page
+        <Link to="/" className="text-2xl font-thin ">
+          Your page name
         </Link>
 
         {/* Navigation Links */}
@@ -48,16 +48,10 @@ function Navbar() {
           ) : (
             <>
               <Link
-                to="/register"
-                className="hover:text-gray-300 transition duration-300"
-              >
-                Register
-              </Link>
-              <Link
                 to="/login"
-                className="bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300"
+                className="bg-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-600 transition duration-300"
               >
-                Login
+                Login || Sign Up
               </Link>
             </>
           )}
