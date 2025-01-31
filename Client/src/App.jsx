@@ -9,9 +9,6 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
-axios.defaults.baseURL = "http://localhost:8000";
-axios.defaults.withCredentials = true;
-
 function App() {
   return (
     <UserContextProvider>
@@ -30,3 +27,6 @@ function App() {
 }
 
 export default App;
+
+axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.withCredentials = true;

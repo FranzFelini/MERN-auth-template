@@ -1,66 +1,58 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function ToDoCmp() {
-  const [todos, setTodos] = useState([]); // State for todos
-  const [newTodo, setNewTodo] = useState(""); // State for new todo
+function ToDoList() {
+  const [todos, setTodos] = useState([]);
+  const [newTask, setNewTask] = useState("");
 
-  // Fetch todos when component loads
+  // Fetch todos after login
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/todos", { withCredentials: true })
-      .then((res) => setTodos(res.data))
-      .catch((err) => console.log(err));
+      .then((response) => {
+        setTodos(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching todos:", error);
+      });
   }, []);
 
-  // Function to add a todo
-  const addTodo = () => {
-    if (!newTodo) return;
+  // Handle adding a new todo
+  const handleAddTodo = () => {
+    if (!newTask) return;
 
     axios
       .post(
         "http://localhost:8000/api/todos",
-        { text: newTodo },
+        { task: newTask },
         { withCredentials: true }
       )
-      .then((res) => {
-        setTodos([...todos, res.data]); // Update state with new todo
-        setNewTodo(""); // Clear input
+      .then((response) => {
+        setTodos([...todos, response.data]);
+        setNewTask(""); // Clear input field
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        console.error("Error adding todo:", error);
+      });
   };
 
   return (
-    <div className="mt-4 p-4 bg-gray-200 rounded-lg">
-      <h2 className="text-xl font-bold">Your To-Do List</h2>
-
-      {/* Input for adding new todo */}
-      <div className="flex mt-2">
-        <input
-          type="text"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="Add a new task..."
-          className="flex-1 p-2 border rounded-l"
-        />
-        <button
-          onClick={addTodo}
-          className="bg-blue-500 text-white p-2 rounded-r"
-        >
-          Add
-        </button>
-      </div>
-
-      {/* Display todos */}
-      <ul className="mt-2">
+    <div>
+      <h1>My Todo List</h1>
+      <ul>
         {todos.map((todo) => (
-          <li key={todo._id} className="p-2 bg-white rounded shadow my-2">
-            {todo.text}
-          </li>
+          <li key={todo._id}>{todo.task}</li>
         ))}
       </ul>
+      <input
+        type="text"
+        value={newTask}
+        onChange={(e) => setNewTask(e.target.value)}
+        placeholder="Add a new task"
+      />
+      <button onClick={handleAddTodo}>Add Task</button>
     </div>
   );
 }
 
-export default ToDoCmp;
+export default ToDoList;

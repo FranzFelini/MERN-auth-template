@@ -1,24 +1,31 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 
-// Creating the UserContext
-export const UserContext = createContext({});
+// Create the context
+export const UserContext = createContext({
+  user: null,
+  setUser: () => {},
+});
 
-// Provider Component
+// UserContextProvider component
 // eslint-disable-next-line react/prop-types
 export function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  // Fetch user info when app loads
   useEffect(() => {
-    axios
-      .get("/profile", { withCredentials: true }) // Ensure credentials (cookies) are sent
-      .then(({ data }) => {
-        setUser(data); // Set user state with data from backend
-      })
-      .catch(() => {
-        setUser(null); // Reset user on error (like expired session)
-      });
+    // Fetch the user on app load
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get("/profile", { withCredentials: true });
+        if (data && data.user) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.log("Error fetching user:", error);
+        setUser(null); // Reset user if there's an error
+      }
+    };
+    fetchUser();
   }, []);
 
   return (
