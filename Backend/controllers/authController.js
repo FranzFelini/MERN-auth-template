@@ -18,16 +18,28 @@ const registerUser = async (req, res) => {
         error: "Name is required",
       });
     }
-    if (!password || password.length < 8) {
+    // Password validation
+    const passwordRegex = /^(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~\\-]).{8,}$/;
+    if (!password || password.length <= 7) {
       return res.json({
-        error: "Password must be 8+ characters long",
+        error: "Password must be 7+ characters long",
+      });
+    } else if (!passwordRegex.test(password)) {
+      return res.json({
+        error: "Password must contain at least one special character",
       });
     }
 
+    // Email validation (at least 3 chars in the name, must include '@', at least 3 chars in domain name, at least 2 chars in top level domain)
     const exist = await UserModel.findOne({ email });
+    const regex = /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,}$/;
     if (exist) {
       return res.json({
         error: "Email already taken",
+      });
+    } else if (!regex.test(email)) {
+      return res.json({
+        error: "Invalid email format (format : your.email@domain.com)",
       });
     }
 
@@ -94,9 +106,14 @@ const getProfile = (req, res) => {
   }
 };
 
-/* Test functionalty, figured out that it was useless here so feel free to delete it :D When you do there might be
-some problems with the imports so take care of that before you run anything.
+/* 
+
+   Test functionalty, figured out that it was useless here so feel free to delete it. 
+   Maybe you can use it for testing, that's why I left it there :D When adn if you do, 
+   there might be some problems with the imports so take care of that before you run anything.
+
 */
+
 const addTodo = async (req, res) => {
   try {
     const { task } = req.body;
