@@ -4,13 +4,12 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { UserContextProvider } from "../context/userContext";
 import "./App.css";
 import Navbar from "./components/NavCmp";
+import AddBookPage from "./pages/AddBookPage";
 import DashboardPage from "./pages/DashboardPage";
 import EditProfile from "./pages/EditProfile";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-
-// Set axios defaults
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials = true;
 
@@ -18,19 +17,18 @@ function App() {
   return (
     <UserContextProvider>
       <Navbar />
-      <Toaster position="top right" toastOptions={{ duration: 2000 }} />
+      <Toaster position="bottom right" toastOptions={{ duration: 3000 }} />
       <Routes>
-        {/* Public routes */}
+        {/* PUBLIC ROUTES */}
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/editprofile" element={<EditProfile />} />
-
-        {/* Protected route */}
+        <Route path="/add-book" element={<AddBookPage />} />{" "}
+        {/* Add new route */}
+        {/* PROTECTED ROUTES */}
         <Route path="/dashboard" element={<DashboardPage />} />
-
-        {/* Catch all route */}
         <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </UserContextProvider>

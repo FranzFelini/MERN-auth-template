@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
@@ -43,8 +44,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Mount routes under /api/user
+// Mount routes
 app.use("/api/user", require("./routes/authRoutes"));
+app.use("/api/books", require("./routes/bookRoutes")); // Ensure route is correctly mounted
 
 // Handle 404 routes
 app.use((req, res) => {

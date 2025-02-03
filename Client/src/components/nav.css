@@ -1,0 +1,137 @@
+/* Importing the Orbitron font */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&display=swap");
+
+/* Navbar container */
+nav {
+  font-family: "Orbitron", sans-serif; /* Apply futuristic font */
+  transition: background-color 0.3s ease, transform 0.3s ease,
+    box-shadow 0.3s ease;
+  z-index: 1000;
+}
+
+/* Navbar links and buttons */
+nav a,
+nav button {
+  font-family: "Orbitron", sans-serif; /* Apply futuristic font */
+  transition: transform 0.3s ease, color 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  padding: 10px 15px;
+}
+
+nav a:hover,
+nav button:hover {
+  transform: scale(1.1);
+  color: #e5e7eb; /* Light gray */
+  background-color: rgba(255, 255, 255, 0.1); /* Soft background on hover */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+}
+
+/* Active link on hover */
+nav .active {
+  color: #fbbf24; /* Orange accent */
+  text-decoration: underline;
+  transform: scale(1.05);
+}
+
+/* Logo hover effect */
+nav .text-white:hover {
+  color: #e5e7eb; /* Light gray */
+  transform: scale(1.05) rotate(5deg);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Button hover effect */
+nav button {
+  transition: transform 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+  border: none;
+  border-radius: 5px;
+}
+
+nav button:hover {
+  transform: scale(1.05);
+  background-color: #b91c1c; /* Red shade on hover */
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+/* Mobile Menu animation */
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+/* When mobile menu is visible, animate it */
+.md\\:hidden .mobile-menu.open {
+  animation: slideIn 0.5s ease-out forwards;
+}
+
+/* When mobile menu is hidden, animate it */
+.md\\:hidden .mobile-menu.close {
+  animation: slideOut 0.5s ease-in forwards;
+}
+
+/* Fade in effect for dropdown */
+nav .dropdown {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+nav .dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Navbar background change on scroll */
+@keyframes backgroundChange {
+  0% {
+    background-color: rgba(17, 24, 39, 0.7);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    background-color: rgba(17, 24, 39, 0.9);
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+nav.scrolled {
+  animation: backgroundChange 0.4s ease-in-out forwards;
+}
+
+nav.scrolled {
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+nav .logo {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+nav .logo:hover {
+  transform: scale(1.1) rotate(10deg);
+  filter: brightness(1.1);
+}
+
+nav .profile-logout:hover {
+  background-color: #b91c1c;
+  transform: scale(1.05);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}

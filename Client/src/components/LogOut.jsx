@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { toast } from "react-hot-toast";
 import { UserContext } from "../../context/userContext";
 
-// Define API base URL - you might want to move this to a config file
 const API_URL = "http://localhost:8000/api/user";
 
 function Logout() {
@@ -11,7 +10,6 @@ function Logout() {
 
   const handleLogout = async () => {
     try {
-      // Show loading state
       const loadingToast = toast.loading("Logging out...");
 
       const response = await axios.post(
@@ -22,17 +20,13 @@ function Logout() {
         }
       );
 
-      // Dismiss loading toast
       toast.dismiss(loadingToast);
 
       if (response.status === 200) {
-        // Clear user state
         setUser(null);
 
-        // Show success message
         toast.success("Logged out successfully");
 
-        // Redirect after a short delay
         setTimeout(() => {
           window.location.href = "/login";
         }, 300);
@@ -40,10 +34,8 @@ function Logout() {
     } catch (error) {
       console.error("Logout error:", error);
 
-      // Clear user state even if API call fails
       setUser(null);
 
-      // Show error message
       toast.error(
         "Logout encountered an error, but you've been logged out locally"
       );

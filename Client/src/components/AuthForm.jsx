@@ -14,7 +14,6 @@ function AuthForm({ type }) {
     e.preventDefault();
     const { name, email, password } = data;
 
-    // Update the endpoint to include the /api/user prefix
     const endpoint =
       type === "register" ? "/api/user/register" : "/api/user/login";
 
@@ -27,7 +26,6 @@ function AuthForm({ type }) {
           password,
         },
         {
-          // If needed, set withCredentials to true to allow sending cookies
           withCredentials: true,
         }
       );
@@ -37,14 +35,13 @@ function AuthForm({ type }) {
         return;
       }
 
-      // Clear form fields after successful submission
       setData({ name: "", email: "", password: "" });
 
       if (type === "register") {
         toast.success("Registration successful! Please log in.");
-        navigate("/login"); // Navigate to login after successful registration
+        navigate("/login");
       } else {
-        setUser(responseData.user); // Set user context on login
+        setUser(responseData.user);
         toast.success("Logged in successfully!");
         navigate("/dashboard");
       }

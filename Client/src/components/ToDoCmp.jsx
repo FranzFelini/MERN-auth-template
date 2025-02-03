@@ -5,7 +5,6 @@ function ToDoList() {
   const [todos, setTodos] = useState([]);
   const [newTask, setNewTask] = useState("");
 
-  // Fetch todos after login
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/todos", { withCredentials: true })
@@ -29,7 +28,7 @@ function ToDoList() {
       )
       .then((response) => {
         setTodos([...todos, response.data]);
-        setNewTask(""); // Clear input field
+        setNewTask("");
       })
       .catch((error) => {
         console.error("Error adding todo:", error);

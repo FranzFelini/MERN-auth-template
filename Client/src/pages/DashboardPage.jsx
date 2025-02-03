@@ -14,9 +14,11 @@ function Dash() {
       </div>
     );
   }
+
   const profilePicUrl = user.profilePic.startsWith("http")
     ? user.profilePic
     : `http://localhost:8000${user.profilePic}`;
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-gray-950 via-blue-950 to-indigo-600">
       <div className="bg-white shadow-2xl rounded-3xl p-8 text-center w-full sm:w-96">
@@ -46,6 +48,14 @@ function Dash() {
             className="block px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition duration-200"
           >
             Back to Dashboard
+          </Link>
+
+          {/* Add Book button */}
+          <Link
+            to="/add-book"
+            className="block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200"
+          >
+            Add Book
           </Link>
         </div>
       </div>
