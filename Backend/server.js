@@ -3,18 +3,11 @@ const cors = require("cors");
 const dotenv = require("dotenv").config();
 const { mongoose } = require("mongoose");
 const cookieParser = require("cookie-parser");
-
-/*
-Important Notice:
-This is a work-in-progress version of the authentication system. 
-It is intended only as a starting point for development.
- Please note that validation is currently incomplete and unreliable. 
- Do not use this in any production environment. It is critical to improve security, 
- implement thorough validation, and conduct additional testing before deploying a final product.
-*/
+const path = require("path");
 
 const app = express();
-//database connection (preferably MongoDB Atlas)
+
+// Database connection
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
@@ -24,15 +17,41 @@ mongoose
     console.log("database NOT connected", error);
   });
 
-// mid.W
+// Configure CORS with specific options
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-//ROUTE TO TEST IT hahah :d
-app.use("/", require("./routes/authRoutes"));
+// Serve static files from uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: "Something broke!",
+    details: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
+});
+
+// Mount routes under /api/user
+app.use("/api/user", require("./routes/authRoutes"));
+
+// Handle 404 routes
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 const port = 8000;
 app.listen(port, () => {
-  console.log(`Server running on ${port}`);
+  console.log(`Server running on port ${port}`);
 });

@@ -14,26 +14,37 @@ function AuthForm({ type }) {
     e.preventDefault();
     const { name, email, password } = data;
 
-    const endpoint = type === "register" ? "/register" : "/login";
+    // Update the endpoint to include the /api/user prefix
+    const endpoint =
+      type === "register" ? "/api/user/register" : "/api/user/login";
+
     try {
-      const { data: responseData } = await axios.post(endpoint, {
-        name,
-        email,
-        password,
-      });
+      const { data: responseData } = await axios.post(
+        endpoint,
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          // If needed, set withCredentials to true to allow sending cookies
+          withCredentials: true,
+        }
+      );
 
       if (responseData.error) {
         toast.error(responseData.error);
         return;
       }
 
-      setData({ name: "", email: "", password: "" }); // Clear form fields
+      // Clear form fields after successful submission
+      setData({ name: "", email: "", password: "" });
 
       if (type === "register") {
         toast.success("Registration successful! Please log in.");
-        navigate("/login"); // Immediately navigate to login after successful registration
+        navigate("/login"); // Navigate to login after successful registration
       } else {
-        setUser(responseData.user); // Only set user context for login
+        setUser(responseData.user); // Set user context on login
         toast.success("Logged in successfully!");
         navigate("/dashboard");
       }
@@ -63,7 +74,7 @@ function AuthForm({ type }) {
               <input
                 type="text"
                 placeholder="John Doe"
-                value={data.name || ""}
+                value={data.name}
                 onChange={(e) => setData({ ...data, name: e.target.value })}
                 className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
@@ -77,7 +88,7 @@ function AuthForm({ type }) {
             <input
               type="email"
               placeholder="you@example.com"
-              value={data.email || ""}
+              value={data.email}
               onChange={(e) => setData({ ...data, email: e.target.value })}
               className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
@@ -90,7 +101,7 @@ function AuthForm({ type }) {
             <input
               type="password"
               placeholder="********"
-              value={data.password || ""}
+              value={data.password}
               onChange={(e) => setData({ ...data, password: e.target.value })}
               className="w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />

@@ -1,8 +1,8 @@
-import { compare } from "bcrypt";
-import jwt from "jsonwebtoken";
-import { hash } from "../helpers/authEncryption.js";
-import TodoModel from "../models/todo.js";
-import UserModel from "../models/user.js";
+// controllers/authController.js
+const { compare } = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { hash } = require("../helpers/authEncryption.js");
+const UserModel = require("../models/user.js");
 
 // Test route
 const test = (req, res) => {
@@ -14,29 +14,24 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name) {
-      return res.json({
-        error: "Name is required",
-      });
+      return res.json({ error: "Name is required" });
     }
+
     // Password validation
     const passwordRegex = /^(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?/~\\-]).{8,}$/;
     if (!password || password.length <= 7) {
-      return res.json({
-        error: "Password must be 7+ characters long",
-      });
+      return res.json({ error: "Password must be 7+ characters long" });
     } else if (!passwordRegex.test(password)) {
       return res.json({
         error: "Password must contain at least one special character",
       });
     }
 
-    // Email validation (at least 3 chars in the name, must include '@', at least 3 chars in domain name, at least 2 chars in top level domain)
+    // Email validation
     const exist = await UserModel.findOne({ email });
     const regex = /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,}$/;
     if (exist) {
-      return res.json({
-        error: "Email already taken",
-      });
+      return res.json({ error: "Email already taken" });
     } else if (!regex.test(email)) {
       return res.json({
         error: "Invalid email format (format : your.email@domain.com)",
@@ -44,7 +39,12 @@ const registerUser = async (req, res) => {
     }
 
     const hashedPass = await hash(password);
-    const user = await UserModel.create({ name, email, password: hashedPass });
+    const user = await UserModel.create({
+      name,
+      email,
+      password: hashedPass,
+      profilePic: "/default-avatar.png", // Default profile picture
+    });
 
     return res.json(user);
   } catch (error) {
@@ -59,41 +59,52 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
     const user = await UserModel.findOne({ email });
     if (!user) {
-      return res.json({
-        error: "No user found",
-      });
+      return res.status(404).json({ error: "No user found" });
     }
 
     const match = await compare(password, user.password);
     if (match) {
+      // Ensure profile picture has complete URL
+      const userProfile = {
+        email: user.email,
+        id: user._id,
+        name: user.name,
+        profilePic: user.profilePic
+          ? user.profilePic.startsWith("http")
+            ? user.profilePic
+            : `/uploads/${user.profilePic.split("/").pop()}`
+          : "/default-avatar.png",
+      };
+
       jwt.sign(
-        { email: user.email, id: user._id, name: user.name },
+        userProfile,
         process.env.JWT_SECRET,
         { expiresIn: "1h" },
         (err, token) => {
           if (err) {
             console.log(err);
-            return res.status(500).json({
-              error: "Failed to generate token",
-            });
+            return res.status(500).json({ error: "Failed to generate token" });
           }
-          res.cookie("token", token).json({ token, user });
+          res
+            .cookie("token", token, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              sameSite: "lax",
+              maxAge: 3600000, // 1 hour
+            })
+            .json({ user: userProfile });
         }
       );
     } else {
-      res.json({
-        error: "Passwords don't match",
-      });
+      res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      error: "Server error",
-    });
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Server error during login" });
   }
 };
 
-// req for JWT
+// GET req for user profile
 const getProfile = (req, res) => {
   const { token } = req.cookies;
   if (token) {
@@ -106,79 +117,108 @@ const getProfile = (req, res) => {
   }
 };
 
-/* 
-
-   Test functionalty, figured out that it was useless here so feel free to delete it. 
-   Maybe you can use it for testing, that's why I left it there :D When adn if you do, 
-   there might be some problems with the imports so take care of that before you run anything.
-
-*/
-
-const addTodo = async (req, res) => {
+// POST req for updating profile (name & profile picture)
+// In authController.js
+const updateProfile = async (req, res) => {
   try {
-    const { task } = req.body;
-    const userId = req.user.id; // Get the logged-in user's ID from the token
+    const { name, email } = req.body;
+    const userId = req.user._id; // Get userId from the authenticated user
 
-    const newTodo = new TodoModel({
-      task,
-      user: userId,
+    // Check if userId is available
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is missing" });
+    }
+
+    let updateFields = {};
+
+    // Only include fields that are actually provided
+    if (name) updateFields.name = name;
+    if (email) {
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          error: "Invalid email format (format: your.email@domain.com)",
+        });
+      }
+      updateFields.email = email;
+    }
+
+    if (req.file) {
+      // Handle file upload as before
+      const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+      if (!allowedTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({
+          error: "Invalid file type. Only JPEG, PNG and GIF are allowed.",
+        });
+      }
+
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (req.file.size > maxSize) {
+        return res.status(400).json({
+          error: "File size too large. Maximum size is 5MB.",
+        });
+      }
+
+      updateFields.profilePic = `/uploads/${req.file.filename}`;
+    }
+
+    // Check if there are any fields to update
+    if (Object.keys(updateFields).length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No valid fields provided for update" });
+    }
+
+    // Attempt to find and update the user
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      userId,
+      updateFields,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      message: "Profile updated successfully",
+      user: updatedUser,
     });
-
-    await newTodo.save();
-    res.status(201).json(newTodo);
   } catch (error) {
-    res.status(500).json({ error: "Failed to add todo" });
+    console.error("Profile update error:", error);
+    res.status(500).json({
+      error: "Failed to update profile",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 };
 
-const getTodos = async (req, res) => {
+// POST req for logout
+const logoutUser = async (req, res) => {
   try {
-    const userId = req.user.id; // Get the logged-in user's ID from the token
-    const todos = await TodoModel.find({ user: userId });
-    res.json(todos);
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      expires: new Date(0),
+    });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch todos" });
+    console.error("Logout error:", error);
+    res.status(500).json({ error: "Server error during logout" });
   }
 };
 
-const completeTodo = async (req, res) => {
-  try {
-    const todo = await TodoModel.findById(req.params.id);
-    if (!todo) return res.status(404).json({ error: "Todo not found" });
-
-    if (todo.user.toString() !== req.user.id)
-      return res.status(403).json({ error: "Unauthorized" });
-
-    todo.isCompleted = true;
-    await todo.save();
-    res.json(todo);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to mark todo as completed" });
-  }
-};
-
-const deleteTodo = async (req, res) => {
-  try {
-    const todo = await TodoModel.findById(req.params.id);
-    if (!todo) return res.status(404).json({ error: "Todo not found" });
-
-    if (todo.user.toString() !== req.user.id)
-      return res.status(403).json({ error: "Unauthorized" });
-
-    await todo.remove();
-    res.json({ message: "Todo deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete todo" });
-  }
-};
-
-export default {
+module.exports = {
   test,
   registerUser,
   loginUser,
   getProfile,
-  addTodo,
-  getTodos,
-  completeTodo,
-  deleteTodo,
+  updateProfile,
+  logoutUser,
 };

@@ -1,64 +1,100 @@
 import axios from "axios";
 import { useContext } from "react";
 import { toast } from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 
-function Navbar() {
+function NavCmp() {
   const { user, setUser } = useContext(UserContext);
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axios.post("/logout", {}, { withCredentials: true });
-      setUser(null); // Clear user context
-      toast.success("Logged out successfully");
-      navigate("/"); // Redirect to home
+      // Make sure we're using the full URL path
+      const response = await axios.post(
+        "http://localhost:8000/api/user/logout",
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data) {
+        // Clear user context
+        setUser(null);
+
+        // Clear any stored data
+        localStorage.removeItem("user");
+
+        toast.success("Logged out successfully");
+
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 300);
+      }
     } catch (error) {
-      console.error("Logout failed", error);
-      toast.error("Logout failed");
+      console.error("Logout failed:", error);
+
+      // Force logout anyway
+      setUser(null);
+      localStorage.removeItem("user");
+
+      toast.error(
+        "Logout encountered an error, but you've been logged out locally"
+      );
+
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 300);
     }
   };
 
   return (
-    <nav className="bg-black text-white px-6 py-4 shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <Link to="/" className="text-2xl font-thin ">
-          Your page name
-        </Link>
+    <nav className="bg-white shadow">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link to="/" className="text-xl font-bold text-gray-800">
+              Home
+            </Link>
+          </div>
 
-        {/* Navigation Links */}
-        <div className="flex gap-6 items-center">
-          {user ? (
-            <>
-              <Link
-                to="/dashboard"
-                className="hover:text-gray-300 transition duration-300"
-              >
-                Profile
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="bg-indigo-400 px-4 py-2 rounded-lg hover:bg-indigo-600 transition duration-300"
-              >
-                Login || Sign Up
-              </Link>
-            </>
-          )}
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-gray-700 hover:text-gray-900">
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-gray-700 hover:text-gray-900"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>
   );
 }
 
-export default Navbar;
+export default NavCmp;

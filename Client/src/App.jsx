@@ -5,6 +5,7 @@ import { UserContextProvider } from "../context/userContext";
 import "./App.css";
 import Navbar from "./components/NavCmp";
 import DashboardPage from "./pages/DashboardPage";
+import EditProfile from "./pages/EditProfile";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/editprofile" element={<EditProfile />} />
 
         {/* Protected route */}
         <Route path="/dashboard" element={<DashboardPage />} />

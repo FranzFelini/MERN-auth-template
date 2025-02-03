@@ -26,6 +26,10 @@ const userSchema = new Schema(
       required: true,
       minlength: 6,
     },
+    profilePic: {
+      type: String,
+      default: "/default-avatar.png", // Default profile picture
+    },
   },
   { timestamps: true, collection: "Users" }
 );
