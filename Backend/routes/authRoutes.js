@@ -3,6 +3,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { requireAuth } = require("../middleware/authMiddleware"); // Make sure you import it
 
 const {
   test,
@@ -84,20 +85,20 @@ router.get("/profile", getProfile);
 // Profile update route with error handling
 router.post(
   "/update-profile",
-  upload.single("profilePic"),
-  handleMulterError,
+  requireAuth, // Ensure the authentication middleware is used
+  upload.single("profilePic"), // Multer upload middleware
+  handleMulterError, // Multer error handler
   async (req, res, next) => {
     try {
       if (req.file) {
-        // Add the file path to the request body
         req.body.profilePicPath = `/uploads/${req.file.filename}`;
       }
-      next();
+      next(); // Continue to updateProfile handler
     } catch (error) {
-      next(error);
+      next(error); // Pass errors to next middleware
     }
   },
-  updateProfile
+  updateProfile // This must be a function in your controller
 );
 
 router.post("/logout", logoutUser);

@@ -122,53 +122,48 @@ const getProfile = (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
-    const userId = req.user._id; // Get userId from the authenticated user
+    const userId = req.user._id;
 
-    // Check if userId is available
     if (!userId) {
-      return res.status(400).json({ error: "User ID is missing" });
+      console.log("User ID is missing");
+      return res
+        .status(400)
+        .json({ error: "User ID is missing. Please log in." });
     }
 
     let updateFields = {};
 
-    // Only include fields that are actually provided
     if (name) updateFields.name = name;
     if (email) {
       const emailRegex =
         /^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]{3,}\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(email)) {
-        return res.status(400).json({
-          error: "Invalid email format (format: your.email@domain.com)",
-        });
+        return res.status(400).json({ error: "Invalid email format." });
       }
       updateFields.email = email;
     }
 
+    // Handle profilePic
     if (req.file) {
-      // Handle file upload as before
+      console.log("File uploaded:", req.file);
       const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!allowedTypes.includes(req.file.mimetype)) {
-        return res.status(400).json({
-          error: "Invalid file type. Only JPEG, PNG and GIF are allowed.",
-        });
+        return res.status(400).json({ error: "Invalid file type." });
       }
-
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (req.file.size > maxSize) {
-        return res.status(400).json({
-          error: "File size too large. Maximum size is 5MB.",
-        });
+        return res.status(400).json({ error: "File size too large." });
       }
-
       updateFields.profilePic = `/uploads/${req.file.filename}`;
     }
 
-    // Check if there are any fields to update
+    // Ensure we have valid fields to update
     if (Object.keys(updateFields).length === 0) {
-      return res
-        .status(400)
-        .json({ error: "No valid fields provided for update" });
+      console.log("No valid fields provided to update.");
+      return res.status(400).json({ error: "No valid fields to update." });
     }
+
+    console.log("Updating user profile with data:", updateFields);
 
     // Attempt to find and update the user
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -181,7 +176,8 @@ const updateProfile = async (req, res) => {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
+      console.log("User not found:", userId);
+      return res.status(404).json({ error: "User not found." });
     }
 
     return res.json({
@@ -189,9 +185,9 @@ const updateProfile = async (req, res) => {
       user: updatedUser,
     });
   } catch (error) {
-    console.error("Profile update error:", error);
+    console.error("Profile update error:", error); // Enhanced error logging
     res.status(500).json({
-      error: "Failed to update profile",
+      error: "Failed to update profile.",
       details:
         process.env.NODE_ENV === "development" ? error.message : undefined,
     });
