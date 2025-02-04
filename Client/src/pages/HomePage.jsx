@@ -18,8 +18,8 @@ const Home = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5 }}
       >
-        Explore a world of innovation and technology with a sleek, modern design
-        that enhances your digital experience.
+        This is the test sample of the home page, and is only meant to be
+        modified, using it raw might cause certain security breaches
       </motion.p>
       <Link to="/register">
         <motion.button

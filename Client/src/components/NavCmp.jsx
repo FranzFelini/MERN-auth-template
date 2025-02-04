@@ -55,7 +55,7 @@ function NavCmp() {
             to="/"
             className="text-3xl font-bold text-white hover:text-gray-300 transition duration-300 transform hover:scale-105"
           >
-            BookShop
+            YourPageTemplate
           </Link>
         </div>
 
