@@ -50,12 +50,11 @@ function Dash() {
             Back to Dashboard
           </Link>
 
-          {/* Add Book button */}
           <Link
             to="/add-book"
             className="block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200"
           >
-            Add Book
+            Add something / Go somewhere
           </Link>
         </div>
       </div>

@@ -42,7 +42,6 @@ router.get("/", async (req, res) => {
 });
 
 // DELETE route to remove a book
-// DELETE route to remove a book
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
     const book = await BookModel.findById(req.params.id);
@@ -52,12 +51,66 @@ router.delete("/:id", requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Unauthorized action" });
     }
 
-    // Use deleteOne or findByIdAndDelete instead of remove
     await BookModel.findByIdAndDelete(req.params.id);
-
     res.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
     console.error("Error deleting book:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ADD/Modify Book Review - POST
+router.post("/:bookId/review", requireAuth, async (req, res) => {
+  const { reviewText, rating } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const book = await BookModel.findById(req.params.bookId);
+    if (!book) return res.status(404).json({ message: "Book not found" });
+
+    const review = {
+      user: userId,
+      reviewText,
+      rating,
+    };
+
+    book.reviews.push(review);
+    await book.save();
+
+    res.status(201).json({ message: "Review added successfully", review });
+  } catch (error) {
+    console.error("Error adding review:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE Book Review
+router.delete("/:bookId/review/:reviewId", requireAuth, async (req, res) => {
+  const { bookId, reviewId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const book = await BookModel.findById(bookId);
+    if (!book) return res.status(404).json({ message: "Book not found" });
+
+    const reviewIndex = book.reviews.findIndex(
+      (review) => review._id.toString() === reviewId
+    );
+    if (reviewIndex === -1)
+      return res.status(404).json({ message: "Review not found" });
+
+    if (book.reviews[reviewIndex].user.toString() !== userId) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to delete this review" });
+    }
+
+    book.reviews.splice(reviewIndex, 1);
+    await book.save();
+
+    res.status(200).json({ message: "Review deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting review:", error);
     res.status(500).json({ error: "Server error" });
   }
 });
